@@ -1,0 +1,119 @@
+<!DOCTYPE html>
+<html lang="de">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Anzeigetafel</title>
+    <style>
+        body { font-family: Arial, sans-serif; background-color: black; color: white; }
+        #anzeigetafel { border: 1px solid #333; padding: 20px; width: 300px; margin: 20px auto; }
+        .stand { margin-bottom: 10px; padding: 10px; border-radius: 5px; color: white; text-align: center; }
+        .stand:nth-child(1) { background-color: #1abc9c; }
+        .stand:nth-child(2) { background-color: #3498db; }
+        .stand:nth-child(3) { background-color: #9b59b6; }
+        .stand:nth-child(4) { background-color: #f39c12; }
+        .stand:nth-child(5) { background-color: #e74c3c; }
+        .stand:nth-child(6) { background-color: #34495e; }
+        .stand:nth-child(7) { background-color: #e67e22; }
+        label, input, button { display: block; margin-bottom: 5px; }
+    </style>
+</head>
+<body>
+
+    <div id="anzeigetafel">
+        <h2>Anzeigetafel</h2>
+        <div id="staende"></div>
+        <hr>
+        <h3>Stand aktualisieren</h3>
+        <label for="standNummer">Standnummer (1-7):</label>
+        <input type="number" id="standNummer" min="1" max="7" required>
+        
+        <label for="standName">Name des Standes (optional):</label>
+        <input type="text" id="standName">
+        
+        <button onclick="punkteHinzufuegen()">Punkt hinzufügen</button>
+        <button onclick="punkteAbziehen()">Punkt abziehen</button>
+        <button onclick="aktualisieren()">Standnamen aktualisieren</button>
+        <button onclick="resetStaende()">Reset</button>
+    </div>
+
+    <script>
+        // Anzeigetafel mit 7 Ständen (Standname und Punktestand)
+        const staende = Array(7).fill(null).map((_, i) => ({
+            name: "", // Optionaler Name
+            punkte: 0,
+            standard: `Stand ${i + 1}` // Standardname
+        }));
+
+        // Anzeige der Anzeigetafel
+        function anzeigen() {
+            const staendeDiv = document.getElementById("staende");
+            staendeDiv.innerHTML = ""; // Leeren
+            
+            // Stände sortieren nach Punktestand (max. Punktestand zuerst)
+            const sortierteStaende = [...staende].sort((a, b) => b.punkte - a.punkte);
+
+            sortierteStaende.forEach((stand, index) => {
+                const standDiv = document.createElement("div");
+                standDiv.className = "stand";
+                
+                let displayName = stand.name || stand.standard;
+                if (stand.punkte >= 10) {
+                    displayName += ` - ${index + 1}. Platz`;
+                }
+                
+                standDiv.textContent = `${displayName}: ${stand.punkte} Punkte`;
+                staendeDiv.appendChild(standDiv);
+            });
+        }
+
+        // Funktion zum Hinzufügen eines Punktes
+        function punkteHinzufuegen() {
+            const standNummer = parseInt(document.getElementById("standNummer").value, 10) - 1;
+            if (standNummer < 0 || standNummer >= staende.length) {
+                alert("Bitte eine gültige Standnummer eingeben.");
+                return;
+            }
+            staende[standNummer].punkte++;
+            anzeigen();
+        }
+
+        // Funktion zum Abziehen eines Punktes
+        function punkteAbziehen() {
+            const standNummer = parseInt(document.getElementById("standNummer").value, 10) - 1;
+            if (standNummer < 0 || standNummer >= staende.length) {
+                alert("Bitte eine gültige Standnummer eingeben.");
+                return;
+            }
+            staende[standNummer].punkte = Math.max(0, staende[standNummer].punkte - 1); // Nicht unter 0 fallen
+            anzeigen();
+        }
+
+        // Funktion zum Aktualisieren des Standnamens
+        function aktualisieren() {
+            const standNummer = parseInt(document.getElementById("standNummer").value, 10) - 1;
+            const standName = document.getElementById("standName").value.trim();
+            
+            if (standNummer < 0 || standNummer >= staende.length) {
+                alert("Bitte eine gültige Standnummer eingeben.");
+                return;
+            }
+            staende[standNummer].name = standName;
+            anzeigen();
+        }
+
+        // Funktion zum Zurücksetzen aller Stände
+        function resetStaende() {
+            staende.forEach(stand => {
+                stand.name = "";
+                stand.punkte = 0;
+            });
+            anzeigen();
+        }
+
+        // Initiale Anzeige der Anzeigetafel
+        anzeigen();
+    </script>
+
+</body>
+</html>
